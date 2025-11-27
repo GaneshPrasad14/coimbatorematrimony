@@ -1,73 +1,158 @@
-# Welcome to your Lovable project
+# Coimbatore Matrimony - MERN Stack
 
-## Project info
+A modern matrimony platform built with the MERN stack (MongoDB, Express.js, React, Node.js) for connecting eligible bachelors and brides aged 30+.
 
-**URL**: https://lovable.dev/projects/9fa72ee2-3c15-400b-87a3-e12592932607
+## Project Structure
 
-## How can I edit this code?
+```
+coimbatore-matrimony/
+├── backend/                 # Node.js/Express API server
+│   ├── config/             # Database configuration
+│   ├── middleware/         # Authentication & upload middleware
+│   ├── models/            # MongoDB data models
+│   ├── routes/            # API endpoints
+│   ├── uploads/           # File upload directory
+│   ├── .env.example       # Environment variables template
+│   ├── package.json       # Backend dependencies
+│   ├── server.js          # Main server file
+│   └── README.md          # Backend documentation
+├── frontend/               # React/Vite frontend application
+│   ├── public/            # Static assets
+│   ├── src/               # React source code
+│   ├── .env               # Frontend environment variables
+│   ├── package.json       # Frontend dependencies
+│   ├── vite.config.ts     # Vite configuration
+│   └── README.md          # Frontend documentation
+├── .gitignore             # Git ignore rules
+└── README.md              # This file
+```
 
-There are several ways of editing your application.
+## Features
 
-**Use Lovable**
+- **Admin Dashboard**: Manage profiles with full CRUD operations
+- **Profile Management**: Create and view detailed profiles
+- **Image Upload**: Support for multiple profile images
+- **Responsive Design**: Mobile-first approach with modern UI
+- **Security**: JWT authentication, CORS, rate limiting
+- **Modern Stack**: React 18, TypeScript, Tailwind CSS, Express.js
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/9fa72ee2-3c15-400b-87a3-e12592932607) and start prompting.
+## Prerequisites
 
-Changes made via Lovable will be committed automatically to this repo.
+- Node.js (v16 or higher)
+- MongoDB (local or Atlas)
+- npm or yarn
 
-**Use your preferred IDE**
+## Installation & Setup
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Backend Setup
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+cd backend
+npm install
+cp .env.example .env
+# Edit .env with your configuration
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Frontend Setup
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-**Use GitHub Codespaces**
+## Environment Variables
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Backend (.env)
+```env
+NODE_ENV=development
+PORT=5000
+FRONTEND_URL=http://localhost:5173
+MONGODB_URI=mongodb://localhost:27017/coimbatore-matrimony
+JWT_SECRET=your-secure-jwt-secret
+ADMIN_EMAIL=admin@coimbatorematrimony.in
+ADMIN_PASSWORD=your-secure-password
+```
 
-## What technologies are used for this project?
+### Frontend (.env)
+```env
+# VITE_API_BASE_URL=https://your-production-api-url
+# Leave commented for localhost development
+```
 
-This project is built with:
+## Development
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Running Both Services
 
-## How can I deploy this project?
+1. **Terminal 1 - Backend:**
+   ```bash
+   cd backend
+   npm run dev
+   ```
 
-Simply open [Lovable](https://lovable.dev/projects/9fa72ee2-3c15-400b-87a3-e12592932607) and click on Share -> Publish.
+2. **Terminal 2 - Frontend:**
+   ```bash
+   cd frontend
+   npm run dev
+   ```
 
-## Can I connect a custom domain to my Lovable project?
+### Access Points
 
-Yes, you can!
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:5000
+- **Admin Login**: http://localhost:5173/admin/login
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## Production Deployment
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+### Backend Deployment
+1. Set up MongoDB Atlas database
+2. Configure environment variables on your hosting platform
+3. Deploy backend to Render, Heroku, or VPS
+
+### Frontend Deployment
+1. Build the frontend: `cd frontend && npm run build`
+2. Deploy `frontend/dist` folder to Netlify, Vercel, or Apache server
+3. Update `VITE_API_BASE_URL` in `.env` for production API URL
+
+## API Endpoints
+
+### Authentication
+- `POST /api/auth/admin/login` - Admin login
+- `POST /api/auth/verify` - Verify admin token
+
+### Profiles
+- `GET /api/profiles` - Get all profiles
+- `GET /api/profiles/:id` - Get single profile
+- `POST /api/profiles` - Create profile (Admin)
+- `PUT /api/profiles/:id` - Update profile (Admin)
+- `DELETE /api/profiles/:id` - Delete profile (Admin)
+
+## Technologies Used
+
+### Frontend
+- React 18 with TypeScript
+- Vite (build tool)
+- Tailwind CSS (styling)
+- React Router (routing)
+- Lucide React (icons)
+- Framer Motion (animations)
+
+### Backend
+- Node.js with Express.js
+- MongoDB with Mongoose
+- JWT for authentication
+- Multer for file uploads
+- CORS, Helmet for security
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## License
+
+This project is licensed under the ISC License.
