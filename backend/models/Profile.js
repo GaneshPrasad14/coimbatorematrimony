@@ -3,124 +3,115 @@ const mongoose = require('mongoose');
 const profileSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, 'Name is required'],
+    required: true,
     trim: true,
-    maxlength: [100, 'Name cannot exceed 100 characters']
+    maxlength: 100
   },
   age: {
     type: Number,
-    required: [true, 'Age is required'],
-    min: [18, 'Age must be at least 18'],
-    max: [100, 'Age cannot exceed 100']
+    required: true,
+    min: 18,
+    max: 100
   },
   gender: {
     type: String,
-    required: [true, 'Gender is required'],
-    enum: {
-      values: ['male', 'female'],
-      message: 'Gender must be either male or female'
-    }
+    required: true,
+    enum: ['male', 'female']
   },
   occupation: {
     type: String,
-    required: [true, 'Occupation is required'],
+    required: true,
     trim: true,
-    maxlength: [100, 'Occupation cannot exceed 100 characters']
+    maxlength: 100
   },
   location: {
     type: String,
-    required: [true, 'Location is required'],
+    required: true,
     trim: true,
-    maxlength: [100, 'Location cannot exceed 100 characters']
+    maxlength: 100
   },
   description: {
     type: String,
-    required: [true, 'Description is required'],
+    required: true,
     trim: true,
-    maxlength: [1000, 'Description cannot exceed 1000 characters']
+    maxlength: 1000
   },
   dob: {
     type: Date,
-    required: [true, 'Date of birth is required']
+    required: true
   },
   contactNumber: {
     type: String,
-    required: [true, 'Contact number is required'],
+    required: true,
     trim: true,
-    maxlength: [15, 'Contact number cannot exceed 15 characters']
+    minlength: 10,
+    maxlength: 15
   },
   whatsappNumber: {
     type: String,
-    required: [true, 'WhatsApp number is required'],
+    required: true,
     trim: true,
-    maxlength: [15, 'WhatsApp number cannot exceed 15 characters']
+    minlength: 10,
+    maxlength: 15
   },
   salary: {
     type: String,
-    required: [true, 'Salary is required'],
+    required: true,
     trim: true,
-    maxlength: [50, 'Salary cannot exceed 50 characters']
+    maxlength: 50
   },
   company: {
     type: String,
-    required: [true, 'Company is required'],
+    required: true,
     trim: true,
-    maxlength: [100, 'Company cannot exceed 100 characters']
+    maxlength: 100
   },
   education: {
     type: String,
-    required: [true, 'Education is required'],
+    required: true,
     trim: true,
-    maxlength: [200, 'Education cannot exceed 200 characters']
+    maxlength: 200
   },
   address: {
     type: String,
-    required: [true, 'Address is required'],
+    required: true,
     trim: true,
-    maxlength: [500, 'Address cannot exceed 500 characters']
+    maxlength: 500
   },
   fatherName: {
     type: String,
-    required: [true, 'Father\'s name is required'],
+    required: true,
     trim: true,
-    maxlength: [100, 'Father\'s name cannot exceed 100 characters']
+    maxlength: 100
   },
   motherName: {
     type: String,
-    required: [true, 'Mother\'s name is required'],
+    required: true,
     trim: true,
-    maxlength: [100, 'Mother\'s name cannot exceed 100 characters']
+    maxlength: 100
   },
-  interests: [{
-    type: String,
-    trim: true,
-    maxlength: [50, 'Each interest cannot exceed 50 characters']
-  }],
-  images: [{
-    type: String,
-    required: true
-  }],
+  interests: [
+    {
+      type: String,
+      trim: true,
+      maxlength: 50
+    }
+  ],
+  images: [
+    {
+      type: String,
+      required: true
+    }
+  ],
   isActive: {
     type: Boolean,
     default: true
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
   }
+}, {
+  timestamps: true // automatic createdAt + updatedAt
 });
 
-// Update the updatedAt field before saving
-profileSchema.pre('save', function(next) {
-  this.updatedAt = Date.now();
-  next();
-});
-
-// Index for better query performance
+// Useful indexes
 profileSchema.index({ gender: 1, isActive: 1 });
 profileSchema.index({ createdAt: -1 });
 
