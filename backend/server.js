@@ -5,71 +5,78 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 require('dotenv').config();
 
-// Import database connection
+// DB connection
 const connectDB = require('./config/database');
 
-// Import routes
+// Routes
 const authRoutes = require('./routes/auth');
 const profileRoutes = require('./routes/profiles');
 
-// Initialize Express app
+// Init app
 const app = express();
 
-// Connect to MongoDB
+// Connect DB
 connectDB();
 
-// Security middleware
+// Security
 app.use(helmet());
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.'
-});
-app.use('/api/', limiter);
+// Rate limiting for API
+app.use(
+  '/api/',
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    message: 'Too many requests. Try again later.'
+  })
+);
 
-// CORS configuration
+// Allowed origins
 const allowedOrigins = [
-  'http://localhost:8080', // Development frontend (Vite default)
-  process.env.FRONTEND_URL || 'http://localhost:8080' // Additional custom URL if set
-].filter(Boolean); // Remove falsy values
+  'http://localhost:8080',
+  'http://localhost:8082',
+  'http://localhost:5173', // Vite default
+  'https://coimbatorematrimony.in',
+  'https://www.coimbatorematrimony.in',
+  process.env.FRONTEND_URL
+].filter(Boolean);
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
+// CORS
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
 
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-  optionSuccessStatus: 200
-};
-app.use(cors(corsOptions));
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        console.warn('❌ Blocked CORS origin:', origin);
+        return callback(null, false); // Do NOT throw errors
+      }
+    },
+    credentials: true
+  })
+);
 
-// Body parsing middleware
+// Body parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Routes
+// API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/profiles', profileRoutes);
 
-// Health check endpoint
+// Health
 app.get('/api/health', (req, res) => {
   res.json({
     success: true,
-    message: 'Coimbatore Matrimony API is running',
+    message: 'Coimbatore Matrimony API Running',
     timestamp: new Date().toISOString()
   });
 });
 
-// 404 handler
-app.use('*', (req, res) => {
+// 404 handler for API only
+app.use('/api/*', (req, res) => {
   res.status(404).json({
     success: false,
     message: 'API endpoint not found'
@@ -78,44 +85,23 @@ app.use('*', (req, res) => {
 
 // Global error handler
 app.use((err, req, res, next) => {
-  console.error('Global error:', err);
+  console.error('🔥 Global error:', err);
 
-  // Multer error handling
   if (err.code === 'LIMIT_FILE_SIZE') {
-    return res.status(400).json({
-      success: false,
-      message: 'File too large. Maximum size is 5MB.'
-    });
+    return res.status(400).json({ success: false, message: 'File too large (max 5MB)' });
   }
 
-  if (err.code === 'LIMIT_FILE_COUNT') {
-    return res.status(400).json({
-      success: false,
-      message: 'Too many files. Maximum 10 files allowed.'
-    });
-  }
-
-  if (err.name === 'ValidationError') {
-    return res.status(400).json({
-      success: false,
-      message: 'Validation error',
-      errors: Object.values(err.errors).map(e => e.message)
-    });
-  }
-
-  res.status(500).json({
+  return res.status(500).json({
     success: false,
-    message: process.env.NODE_ENV === 'production' ? 'Something went wrong!' : err.message
+    message: process.env.NODE_ENV === 'production' ? 'Server error' : err.message
   });
 });
 
 // Start server
 const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📱 Allowed Frontend URLs: ${allowedOrigins.join(', ')}`);
-  console.log(`🔗 API Health Check: http://localhost:${PORT}/api/health`);
+  console.log(`🌐 Allowed Origins: ${allowedOrigins.join(', ')}`);
 });
 
 module.exports = app;
