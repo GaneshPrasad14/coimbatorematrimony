@@ -1,6 +1,6 @@
 # Coimbatore Matrimony - MERN Stack
 
-A modern matrimony platform built with the MERN stack (MongoDB, Express.js, React, Node.js) for connecting eligible bachelors and brides aged 30+.
+A modern matrimony platform built with the MERN stack (MongoDB, Express.js, React, Node.js) for connecting eligible bachelors and brides aged 18+.
 
 ## Project Structure
 
