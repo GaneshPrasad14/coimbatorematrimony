@@ -1,93 +1,101 @@
 const express = require('express');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 
 const router = express.Router();
 
-// Admin credentials (in production, store hashed password in database)
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@coimbatoremartimony.com';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123'; // Change this in production
+// -----------------------------
+// ADMIN CREDENTIALS
+// -----------------------------
+// These should be in your .env file ideally:
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@coimbatorematrimony.in';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Matrimony@2424$'; 
 
-// @route   POST /api/auth/admin/login
-// @desc    Admin login
-// @access  Public
-router.post('/admin/login', [
-  body('email').isEmail().normalizeEmail(),
-  body('password').notEmpty().trim()
-], async (req, res) => {
-  try {
-    // Check for validation errors
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors: errors.array()
-      });
-    }
-
-    const { email, password } = req.body;
-
-    // Check if credentials match
-    if (email !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid email or password'
-      });
-    }
-
-    // Create JWT token
-    const token = jwt.sign(
-      { email: ADMIN_EMAIL, role: 'admin' },
-      process.env.JWT_SECRET || 'your-secret-key',
-      { expiresIn: '24h' }
-    );
-
-    res.json({
-      success: true,
-      message: 'Login successful',
-      token,
-      admin: {
-        email: ADMIN_EMAIL,
-        role: 'admin'
+// -----------------------------
+// POST /api/auth/admin/login
+// -----------------------------
+router.post(
+  '/admin/login',
+  [
+    body('email').isEmail().normalizeEmail(),
+    body('password').notEmpty().trim()
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          success: false,
+          message: 'Validation failed',
+          errors: errors.array()
+        });
       }
-    });
 
-  } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error during login'
-    });
+      const { email, password } = req.body;
+
+      // Check email & password
+      if (email !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid email or password'
+        });
+      }
+
+      // Create JWT token
+      const token = jwt.sign(
+        { email: ADMIN_EMAIL, role: 'admin' },
+        process.env.JWT_SECRET || 'fallback-secret-key',
+        { expiresIn: '24h' }
+      );
+
+      return res.json({
+        success: true,
+        message: 'Login successful',
+        token,
+        admin: {
+          email: ADMIN_EMAIL,
+          role: 'admin'
+        }
+      });
+
+    } catch (error) {
+      console.error('Login error:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Server error during login'
+      });
+    }
   }
-});
+);
 
-// @route   POST /api/auth/verify
-// @desc    Verify admin token
-// @access  Private
+// -----------------------------
+// POST /api/auth/verify
+// -----------------------------
 router.post('/verify', (req, res) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-
-    if (!token) {
+    const authHeader = req.header('Authorization');
+    if (!authHeader) {
       return res.status(401).json({
         success: false,
-        message: 'No token provided'
+        message: 'Missing Authorization header'
       });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    const token = authHeader.replace('Bearer ', '');
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || 'fallback-secret-key'
+    );
 
-    res.json({
+    return res.json({
       success: true,
       admin: decoded
     });
 
   } catch (error) {
-    res.status(401).json({
+    return res.status(401).json({
       success: false,
-      message: 'Invalid token'
+      message: 'Invalid or expired token'
     });
   }
 });
