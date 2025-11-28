@@ -1,33 +1,72 @@
 const multer = require('multer');
 
-// Memory storage for base64 conversion
+// Memory storage
 const memoryStorage = multer.memoryStorage();
+
+// Allowed image types
+const allowedMimeTypes = [
+  'image/jpeg',
+  'image/png',
+  'image/jpg',
+  'image/webp'
+];
 
 // File filter
 const fileFilter = (req, file, cb) => {
-  // Check file type
-  if (file.mimetype.startsWith('image/')) {
+  if (allowedMimeTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('Only image files are allowed!'), false);
+    cb(new Error('Only JPG, PNG, and WEBP image files are allowed!'), false);
   }
 };
 
-// Upload middleware - Memory storage for base64 conversion
+// Multer config
 const upload = multer({
   storage: memoryStorage,
-  fileFilter: fileFilter,
+  fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
-    files: 10 // Maximum 10 files
+    fileSize: 5 * 1024 * 1024, // 5 MB
+    files: 10
   }
 });
 
-// Single file upload
-const uploadSingle = upload.single('image');
+// Multiple images — support flexible field names
+const uploadMultiple = (req, res, next) => {
+  const handler = upload.any(); // any field name allowed
 
-// Multiple files upload
-const uploadMultiple = upload.array('images', 10);
+  handler(req, res, function (err) {
+    if (err instanceof multer.MulterError) {
+      // Multer-specific errors
+      return res.status(400).json({
+        success: false,
+        message: err.message
+      });
+    } else if (err) {
+      // File filter errors or others
+      return res.status(400).json({
+        success: false,
+        message: err.message || 'File upload error'
+      });
+    }
+
+    next();
+  });
+};
+
+// For single image if needed
+const uploadSingle = (req, res, next) => {
+  const handler = upload.single('image');
+
+  handler(req, res, function (err) {
+    if (err) {
+      return res.status(400).json({
+        success: false,
+        message: err.message
+      });
+    }
+    next();
+  });
+};
 
 module.exports = {
   upload,
